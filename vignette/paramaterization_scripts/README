@@ -1,0 +1,7 @@
+Scripts for paramaterization runs on SATURN, where SATURN is run using leiden clusters and we are trying to maximize label transfer accuracy. Parameters we can optimize are leiden cluster resolutions, number of macrogenes/ HV genes that can be used by SATURN. Currently isset up to alter cluster granularity and number of HV genes.
+
+param_saturn.py: Contains entire preprocessing, running SATURN, and label transfer functions. Is currently set up to perform 36 runs (6 cluster resolutions x 6 HV genes counts). Outputs a summary file with label transfer accuracy for each run as well as SATURN outputs foreach run.
+
+sat.sh: helper script for param_saturn.py
+
+view_paramaterization_results.ipynb: Constructs heatmaps summarizing accuracy ratings for each parameterization run and a 6x6 plot of the UMAPs from each run. 

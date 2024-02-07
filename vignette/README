@@ -1,0 +1,44 @@
+The following is a datset-specific (from Birnbaum paper) pipeline to run SATURN. To set up SATURN, follow instructions under "basic pipeline" or visit SATURN's github: https://github.com/snap-stanford/SATURN.
+
+The workflow is as follows: 
+
+1) Preprocess.ipynb: Consists of following steps
+
+a) preprocess: Performs basic preprocessing steps (Filtering, UMI cutoffs, normalization, PCA, Neighbors, UMAP calculations). Note that it is currently set up for cellbender matrix input, which requires use of a helper function (anndata_from_h5) to read into adata (scanpy doesnt have a function to read in cellbender matrices)
+
+inputs: name of sample file (unprocessed count matrix), leiden cluster resolution (1 is default)
+
+outputs: processed adata, written to results file
+
+b) ingest_samples: Merge same species samples into one adata object using scanpy ingest. Works better than harmonypy integration in my experience. 
+
+inputs: array with adata pbjects to merge, element with index 0 is used as reference
+
+outputs: merged adata object with CT labels attached, written to results file
+
+c) attach_CT: attach CT labels from birnbaum paper to adata object. Note this only currently set up for sorghum and maize (not arabadopsis). Cells with no labels are dropped from adata object
+
+inputs: adata object and matrix file name
+
+outputs: adata object with labels for each cell ("lab") , written to results file
+
+d) make_csv(): creates csv for SATURN input, need to update path if you change what samples you use.
+
+2) run_saturn.sh: Wrapper script for running SATURN. 
+
+Example: bash 3_run_SATURN.sh /home/apennacchio/SATURN/train-saturn.py /home/apennacchio/pcsct/saturn/s10_z23.csv leiden lab
+
+inputs:
+	$1 --> path to train-saturn.py file in SATURN repo
+
+	$2 --> path to csv, generated in step 2
+
+	$3 --> column name in processed h5ad files to guide SATURN's integration ("leiden" or cell type labels- "lab")
+
+	$4 --> reference labels (optional)
+
+outputs: directory with various SATURN output files (out/saturn_results)
+
+3) view_saturn_results.ipynb: Code to visualize UMAPs of SATURN outputs, perform differenial expression analysis on macrogenes, and examine gene to macrogene weights. For the example provided, cell type labels were stored in "labels2", but this will be leiden clusters if used "leiden" to guide SATURN's integration.
+
+4) transfer_labels.ipynb: Label transfer from sorghum to maize. The model used is a tree based XGB classifier and has been optimized on this dataset. In the example provided, cell type labels are stored in "labels2". Also has visualizations for label transfer accuracy by CT and examining the classifier's predicitions in UMAP space.
